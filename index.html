@@ -36,6 +36,13 @@
             max-height: 500px; /* Ajuste conforme necessário para o conteúdo */
             transition: max-height 0.7s ease-in;
         }
+        .company-title {
+            background-color: #e2e8f0; /* Um fundo leve para o título da empresa */
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
         .category-title {
             position: sticky;
             top: 0;
@@ -49,7 +56,7 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
     <div class="container bg-white rounded-xl shadow-lg p-8">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Lista de Escalonamento: NOC Claro Brasil</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Lista de Escalonamento de Contatos</h1>
 
         <!-- Botão para mostrar/esconder a lista -->
         <button id="toggleListButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 mb-6">
@@ -57,113 +64,337 @@
         </button>
 
         <!-- Container da lista de empresas/contatos -->
-        <div id="contactList" class="hidden space-y-4">
+        <div id="contactList" class="hidden space-y-8">
             <!-- Conteúdo será gerado aqui pelo JavaScript -->
         </div>
     </div>
 
     <script>
-        // Dados JSON com as informações dos contatos
+        // Dados JSON com as informações dos contatos, agora agrupados por empresa
         const companyData = [
-          {
-            "category": "PROCESSOS GMUD",
-            "contacts": [
-              {
-                "name": "Marcos de Avila de Jesus",
-                "role": "Diretor de Redes NOC",
-                "phone": "+55 11 2111-2499",
-                "mobile": "+55 11 97666-6436",
-                "email": "marcio.avila@claro.com.br"
-              },
-              {
-                "name": "Fernanda Barbosa de Cavalcanti Mello",
-                "role": "Gerente de Integração e Gestão Operacional",
-                "phone": "+55 21 2121-9476",
-                "mobile": "+55 21 97632-3076",
-                "email": "fernanda.mello@claro.com.br"
-              },
-              {
-                "name": "Claudia de Araújo Cardoso",
-                "role": "Coordenadora de GMUD",
-                "phone": "+55 21 2121-8117",
-                "mobile": "+55 21 99222-8924",
-                "email": "claudia.cardoso@claro.com.br"
-              },
-              {
-                "name": "Transport Network Tech. Sup. [8X5]",
-                "role": "(Centro Nacional de Transmissão)",
-                "email": "cntx@claro.com.br"
-              }
-            ]
-          },
-          {
-            "category": "OPERAÇÕES NOC",
-            "contacts": [
-              {
-                "name": "Ricardo Abud Ribeiro",
-                "role": "Gerente de Redes NOC",
-                "phone": "+55 11 2121-2927",
-                "mobile": "+55 11 99202-8147",
-                "email": "ricardo.abud@claro.com.br"
-              },
-              {
-                "name": "Francisco Manoel e Silva",
-                "role": "Gerente de Serviços de Telecom",
-                "phone": "+55 21 2121-2624",
-                "mobile": "+55 21 99222-7970",
-                "email": "francisco.manoel@claro.com.br"
-              },
-              {
-                "name": "Fabio Torres Maximiano",
-                "role": "Gerente de Serviços de Telecom",
-                "phone": "+55 21 2121-3022",
-                "mobile": "+55 21 97629-9141",
-                "email": "fabio.maximiano@claro.com.br"
-              },
-              {
-                "name": "Líder",
-                "subContacts": [
-                  {
-                    "name": "Denison Sena",
-                    "schedule": "2ª à 6ª feiras - 07h00 às 16h00",
-                    "mobile": "+55 21 99215-3921"
-                  },
-                  {
-                    "name": "Rogerio Barbosa",
-                    "schedule": "2ª à 6ª feiras - 10h00 às 19h00",
-                    "mobile": "+55 11 94711-1132"
-                  },
-                  {
-                    "name": "Luciano Medeiros",
-                    "schedule": "2ª à 6ª feiras - 13h00 às 22h00",
-                    "mobile": "+55 11 94721-2923"
-                  },
-                  {
-                    "name": "Gilberto Filadelfo",
-                    "schedule": "2ª à 6ª feiras - 22h00 às 07h00",
-                    "mobile": "+55 21 99385-0415"
-                  },
-                  {
-                    "name": "Sábados e Domingos",
-                    "schedule": "10h00 às 19h00",
-                    "mobile": "+55 21 2323-5425"
-                  }
-                ],
-                "notes": "OBS.: Demais horários, recorrer ao nível acima."
-              },
-              {
-                "name": "Centro de Atendimento a Operadoras [24x7]",
-                "description": "Centro de Operações da Rede de Transporte (Execução de GMUD)",
-                "phone": "0800 704 0041",
-                "mesaOperadora": {
-                  "description": "Mesa Operadora (Abertura de Chamados)",
-                  "phone": "0800 704 4617"
-                },
-                "whatsapp": "+55 21 97361-3969",
-                "email": "noctxrl@claro.com.br; mesadecontrole-l@embratel.net.br"
-              }
-            ]
-          }
+            {
+                "companyName": "Claro",
+                "categories": [
+                    {
+                        "category": "PROCESSOS GMUD",
+                        "contacts": [
+                            {
+                                "name": "Marcos de Avila de Jesus",
+                                "role": "Diretor de Redes NOC",
+                                "phone": "+55 11 2111-2499",
+                                "mobile": "+55 11 97666-6436",
+                                "email": "marcio.avila@claro.com.br"
+                            },
+                            {
+                                "name": "Fernanda Barbosa de Cavalcanti Mello",
+                                "role": "Gerente de Integração e Gestão Operacional",
+                                "phone": "+55 21 2121-9476",
+                                "mobile": "+55 21 97632-3076",
+                                "email": "fernanda.mello@claro.com.br"
+                            },
+                            {
+                                "name": "Claudia de Araújo Cardoso",
+                                "role": "Coordenadora de GMUD",
+                                "phone": "+55 21 2121-8117",
+                                "mobile": "+55 21 99222-8924",
+                                "email": "claudia.cardoso@claro.com.br"
+                            },
+                            {
+                                "name": "Transport Network Tech. Sup. [8X5]",
+                                "role": "(Centro Nacional de Transmissão)",
+                                "email": "cntx@claro.com.br"
+                            }
+                        ]
+                    },
+                    {
+                        "category": "OPERAÇÕES NOC",
+                        "contacts": [
+                            {
+                                "name": "Ricardo Abud Ribeiro",
+                                "role": "Gerente de Redes NOC",
+                                "phone": "+55 11 2121-2927",
+                                "mobile": "+55 11 99202-8147",
+                                "email": "ricardo.abud@claro.com.br"
+                            },
+                            {
+                                "name": "Francisco Manoel e Silva",
+                                "role": "Gerente de Serviços de Telecom",
+                                "phone": "+55 21 2121-2624",
+                                "mobile": "+55 21 99222-7970",
+                                "email": "francisco.manoel@claro.com.br"
+                            },
+                            {
+                                "name": "Fabio Torres Maximiano",
+                                "role": "Gerente de Serviços de Telecom",
+                                "phone": "+55 21 2121-3022",
+                                "mobile": "+55 21 97629-9141",
+                                "email": "fabio.maximiano@claro.com.br"
+                            },
+                            {
+                                "name": "Líder",
+                                "subContacts": [
+                                    {
+                                        "name": "Denison Sena",
+                                        "schedule": "2ª à 6ª feiras - 07h00 às 16h00",
+                                        "mobile": "+55 21 99215-3921"
+                                    },
+                                    {
+                                        "name": "Rogerio Barbosa",
+                                        "schedule": "2ª à 6ª feiras - 10h00 às 19h00",
+                                        "mobile": "+55 11 94711-1132"
+                                    },
+                                    {
+                                        "name": "Luciano Medeiros",
+                                        "schedule": "2ª à 6ª feiras - 13h00 às 22h00",
+                                        "mobile": "+55 11 94721-2923"
+                                    },
+                                    {
+                                        "name": "Gilberto Filadelfo",
+                                        "schedule": "2ª à 6ª feiras - 22h00 às 07h00",
+                                        "mobile": "+55 21 99385-0415"
+                                    },
+                                    {
+                                        "name": "Sábados e Domingos",
+                                        "schedule": "10h00 às 19h00",
+                                        "mobile": "+55 21 2323-5425"
+                                    }
+                                ],
+                                "notes": "OBS.: Demais horários, recorrer ao nível acima."
+                            },
+                            {
+                                "name": "Centro de Atendimento a Operadoras [24x7]",
+                                "description": "Centro de Operações da Rede de Transporte (Execução de GMUD)",
+                                "phone": "0800 704 0041",
+                                "mesaOperadora": {
+                                    "description": "Mesa Operadora (Abertura de Chamados)",
+                                    "phone": "0800 704 4617"
+                                },
+                                "whatsapp": "+55 21 97361-3969",
+                                "email": "noctxrl@claro.com.br; mesadecontrole-l@embratel.net.br"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "companyName": "SUMICITY",
+                "categories": [
+                    {
+                        "category": "ESCALATION LIST SWAP",
+                        "contacts": [
+                            {
+                                "name": "Abertura",
+                                "level": "1º Nível",
+                                "description": "Após 4h da abertura do chamado",
+                                "contact_person": "Lucio Gomes",
+                                "phone": "(22) 2537-8038",
+                                "mobile": "(22) 9-9255-6015",
+                                "telegram": "(22) 9-9252-2618 (Somente Telegram)",
+                                "email": "lucio.gomes@sumicity.net.br",
+                                "notes": "0800 053 0000 (RJ apenas) opção 2 & 1"
+                            },
+                            {
+                                "name": "2º Nível",
+                                "description": "Após 6h da abertura do chamado",
+                                "contact_person": "Mauricio Araujo",
+                                "mobile": "(22) 99278-3949",
+                                "email": "mauricio.araujo@sumicity.net.br"
+                            },
+                            {
+                                "name": "3º Nível",
+                                "description": "Após 8h da abertura do chamado",
+                                "contact_person": "Glauno Junior",
+                                "mobile": "(11) 95041-9877",
+                                "email": "glauno.junior@sumicity.net.br"
+                            },
+                            {
+                                "name": "4º Nível",
+                                "description": "Após 10h da abertura do chamado",
+                                "contact_person": "Diogo Maia",
+                                "mobile": "(22) 99277-4491",
+                                "email": "diogo.maia@sumicity.net.br"
+                            }
+                        ]
+                    },
+                    {
+                        "category": "PONTO FOCAL",
+                        "contacts": [
+                            {
+                                "name": "Supervisor de Operações de Rede",
+                                "contact_person": "Victor Gaio",
+                                "mobile": "(24) 99242-4517",
+                                "email": "victor.gaio@sumicity.net.br"
+                            }
+                        ]
+                    },
+                    {
+                        "category": "CONTATO PARA NOTIFICAÇÕES",
+                        "contacts": [
+                            {
+                                "name": "Centro de Gerencia de Redes",
+                                "phone": "(22) 2537-8038 Op 2 & 1",
+                                "email": "cgr@sumicity.net.br"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "companyName": "VIVO",
+                "categories": [
+                    {
+                        "category": "ESCALONAMENTO NOC",
+                        "contacts": [
+                            {
+                                "name": "Operação Atendimento 24hrs",
+                                "subCategories": [
+                                    {
+                                        "name": "Comunicação e Atendimento",
+                                        "description": "08007700031 opção 1",
+                                        "notes": "Abertura/Gestão de eventos 24 horas swap.back@vivo.com.br.",
+                                        "chatBot": "Abertura/Monitoração/Chatbot",
+                                        "mobile": "+55(11)99412-8643",
+                                        "sla": "SLA contratual de capacidade e de 12 horas."
+                                    },
+                                    {
+                                        "name": "Nível 1 (Operação e Usuário)",
+                                        "contact_person": "LAURENÇO LIMA",
+                                        "mobile": "11 99186-9940",
+                                        "email": "Edson.ca.backbone@vivo.com.br"
+                                    },
+                                    {
+                                        "name": "Atendimento 20h às 07h00",
+                                        "contact_person": "FLÁVIA GUIMARÃES RIBEIRO",
+                                        "mobile": "11 98215-8359",
+                                        "email": "flguimaraes@minat.com.br"
+                                    },
+                                    {
+                                        "name": "Horário 22:00 - 08:00",
+                                        "contact_person": "STEPHANIE SANTOS DOMINGOS",
+                                        "mobile": "11 98215-8359",
+                                        "email": "sdmingos@minat.com.br"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Nível 2 (Interno)",
+                                "subCategories": [
+                                    {
+                                        "name": "Atendimento 24x7 (Interno)",
+                                        "description": "Base de treinamento/Escala",
+                                        "contact_person": "Railson",
+                                        "mobile": "11 99432-1235",
+                                        "email": "railson@minat.com.br"
+                                    },
+                                    {
+                                        "contact_person": "Erick Paim",
+                                        "mobile": "11 99642-8818",
+                                        "email": "epaim@minat.com.br"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Nível 3 (Gerentes e Supervisores)",
+                                "subCategories": [
+                                    {
+                                        "name": "LIDERES DE REGIONAL",
+                                        "schedule": "Horário 07h - 19h",
+                                        "contact_person": "Alan Higa/Mônica Dantas",
+                                        "mobile": "99292-1253",
+                                        "email": "alan.dantas@telefonica.com.br"
+                                    },
+                                    {
+                                        "contact_person": "Segismundo Santana - LESTE / MG",
+                                        "mobile": "+542897353",
+                                        "email": "segismundo.santana@telefonica.com.br"
+                                    },
+                                    {
+                                        "contact_person": "Diego Silva Alves - SUL / SP",
+                                        "mobile": "99432-1235",
+                                        "email": "diego.alves@telefonica.com.br"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Nível 4 (Coordenadores)",
+                                "subCategories": [
+                                    {
+                                        "name": "Horário 07h - 19h",
+                                        "contact_person": "Eliane Ferreira Terra",
+                                        "mobile": "+55(11)99444-4634",
+                                        "email": "eliane.terra@telefonica.com.br"
+                                    },
+                                    {
+                                        "contact_person": "Laura Gabriel Garmas",
+                                        "mobile": "+55(41)9981-8975",
+                                        "email": "laura.garmas@telefonica.com.br"
+                                    },
+                                    {
+                                        "name": "Horário 19h - 07h",
+                                        "contact_person": "Camila Silveira Botelho",
+                                        "mobile": "+55(41)99836-0909",
+                                        "email": "camila.botelho@telefonica.com.br"
+                                    },
+                                    {
+                                        "contact_person": "Natanael Silva de Oliveira",
+                                        "mobile": "+55(41)9921-2918",
+                                        "email": "natanael.silva@telefonica.com.br"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Nível 5 (Gerentes)",
+                                "subCategories": [
+                                    {
+                                        "name": "Horário 08:30 - 18:30",
+                                        "contact_person": "Wanderlei Cherioni",
+                                        "mobile": "+55(41)9981-8975",
+                                        "email": "wanderlei.cherioni@telefonica.com.br"
+                                    },
+                                    {
+                                        "name": "Horário 14h - 22h",
+                                        "contact_person": "Ronaldo Sampaio Acosta",
+                                        "mobile": "+55(41)9936-0909",
+                                        "email": "ronaldo.acosta@telefonica.com.br"
+                                    },
+                                    {
+                                        "name": "Horário 07h - 15:30",
+                                        "contact_person": "Sidnei Oliveira",
+                                        "mobile": "+55(41)9753-8669",
+                                        "email": "sidnei.oliveira@telefonica.com.br"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Nível 6 (Diretores)",
+                                "subCategories": [
+                                    {
+                                        "name": "Após 12 horas de chamado",
+                                        "contact_person": "Alex Rodrigues Paes",
+                                        "mobile": "+55(41)9921-2918",
+                                        "email": "alex.paes@telefonica.com.br"
+                                    },
+                                    {
+                                        "contact_person": "Diego Santos Barbosa",
+                                        "mobile": "+55(41)9936-0909",
+                                        "email": "diego.barbosa@telefonica.com.br"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Após 24 horas de chamado",
+                                "subCategories": [
+                                    {
+                                        "contact_person": "Geraldo Ramassoti",
+                                        "mobile": "+55(41)9981-8975",
+                                        "email": "geraldo.ramassoti@telefonica.com.br"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         ];
 
         const contactListDiv = document.getElementById('contactList');
@@ -179,93 +410,125 @@
         function renderContacts() {
             contactListDiv.innerHTML = ''; // Limpa o conteúdo existente
 
-            companyData.forEach(categoryData => {
-                // Cria um div para a categoria
-                const categorySection = document.createElement('div');
-                categorySection.className = 'mb-6';
+            companyData.forEach(company => {
+                // Cria um div para a empresa
+                const companySection = document.createElement('div');
+                companySection.className = 'mb-8';
 
-                const categoryTitle = document.createElement('h2');
-                categoryTitle.className = 'category-title text-2xl font-semibold text-gray-700 mb-4 pb-2 border-b-2 border-blue-500';
-                categoryTitle.textContent = categoryData.category;
-                categorySection.appendChild(categoryTitle);
+                const companyTitle = document.createElement('h2');
+                companyTitle.className = 'company-title text-2xl font-bold text-gray-800 mb-4';
+                companyTitle.textContent = company.companyName;
+                companySection.appendChild(companyTitle);
 
-                categoryData.contacts.forEach(contact => {
-                    const contactItem = document.createElement('div');
-                    contactItem.className = 'bg-gray-50 p-4 rounded-lg shadow-sm mb-3 cursor-pointer hover:bg-gray-100 transition duration-200 ease-in-out';
+                company.categories.forEach(categoryData => {
+                    // Cria um div para a categoria
+                    const categorySection = document.createElement('div');
+                    categorySection.className = 'mb-6';
 
-                    const contactHeader = document.createElement('div');
-                    contactHeader.className = 'flex justify-between items-center';
-                    contactHeader.innerHTML = `<h3 class="text-lg font-medium text-gray-800">${contact.name}</h3>`;
-                    contactItem.appendChild(contactHeader);
+                    const categoryTitle = document.createElement('h3');
+                    categoryTitle.className = 'category-title text-xl font-semibold text-gray-700 mb-4 pb-2 border-b-2 border-blue-500';
+                    categoryTitle.textContent = categoryData.category;
+                    categorySection.appendChild(categoryTitle);
 
-                    const contactDetails = document.createElement('div');
-                    contactDetails.className = 'contact-item-details mt-2 text-gray-600';
+                    // Função auxiliar para renderizar contatos ou subcategorias
+                    function renderContactOrSubcategory(item, parentElement, isSub = false) {
+                        const contactItem = document.createElement('div');
+                        contactItem.className = `bg-gray-50 p-4 rounded-lg shadow-sm mb-3 cursor-pointer hover:bg-gray-100 transition duration-200 ease-in-out ${isSub ? 'ml-4 border-l-2 border-gray-200 pl-3' : ''}`;
 
-                    if (contact.role) {
-                        contactDetails.innerHTML += `<p><span class="font-semibold">Cargo:</span> ${contact.role}</p>`;
-                    }
-                    if (contact.description) {
-                        contactDetails.innerHTML += `<p><span class="font-semibold">Descrição:</span> ${contact.description}</p>`;
-                    }
-                    if (contact.phone) {
-                        contactDetails.innerHTML += `<p><span class="font-semibold">Telefone:</span> <a href="${formatPhoneNumberForLink(contact.phone)}" class="text-blue-600 hover:underline">${contact.phone}</a></p>`;
-                    }
-                    if (contact.mobile) {
-                        contactDetails.innerHTML += `<p><span class="font-semibold">Celular:</span> <a href="${formatPhoneNumberForLink(contact.mobile)}" class="text-blue-600 hover:underline">${contact.mobile}</a></p>`;
-                    }
-                    if (contact.whatsapp) {
-                        // Link direto para WhatsApp, se aplicável
-                        const whatsappNumber = contact.whatsapp.replace(/[^\d]/g, ''); // Remove caracteres não numéricos
-                        contactDetails.innerHTML += `<p><span class="font-semibold">WhatsApp:</span> <a href="https://wa.me/${whatsappNumber}" target="_blank" class="text-green-600 hover:underline">${contact.whatsapp}</a></p>`;
-                    }
-                    if (contact.email) {
-                        contactDetails.innerHTML += `<p><span class="font-semibold">E-mail:</span> <a href="mailto:${contact.email}" class="text-blue-600 hover:underline">${contact.email}</a></p>`;
-                    }
-                    if (contact.schedule) {
-                        contactDetails.innerHTML += `<p><span class="font-semibold">Horário:</span> ${contact.schedule}</p>`;
-                    }
-                    if (contact.notes) {
-                        contactDetails.innerHTML += `<p class="italic text-sm mt-2">${contact.notes}</p>`;
-                    }
+                        const contactHeader = document.createElement('div');
+                        contactHeader.className = 'flex justify-between items-center';
+                        contactHeader.innerHTML = `<h4 class="text-lg font-medium text-gray-800">${item.name || item.contact_person || 'Informação de Contato'}</h4>`;
+                        contactItem.appendChild(contactHeader);
 
-                    // Lidar com subContatos (ex: Líderes)
-                    if (contact.subContacts && contact.subContacts.length > 0) {
-                        contactDetails.innerHTML += `<p class="font-semibold mt-3">Sub-contatos:</p>`;
-                        contact.subContacts.forEach(subContact => {
+                        const contactDetails = document.createElement('div');
+                        contactDetails.className = 'contact-item-details mt-2 text-gray-600';
+
+                        if (item.role) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Cargo:</span> ${item.role}</p>`;
+                        }
+                        if (item.description) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Descrição:</span> ${item.description}</p>`;
+                        }
+                        if (item.phone) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Telefone:</span> <a href="${formatPhoneNumberForLink(item.phone)}" class="text-blue-600 hover:underline">${item.phone}</a></p>`;
+                        }
+                        if (item.mobile) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Celular:</span> <a href="${formatPhoneNumberForLink(item.mobile)}" class="text-blue-600 hover:underline">${item.mobile}</a></p>`;
+                        }
+                        if (item.whatsapp) {
+                            const whatsappNumber = item.whatsapp.replace(/[^\d]/g, '');
+                            contactDetails.innerHTML += `<p><span class="font-semibold">WhatsApp:</span> <a href="https://wa.me/${whatsappNumber}" target="_blank" class="text-green-600 hover:underline">${item.whatsapp}</a></p>`;
+                        }
+                        if (item.email) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">E-mail:</span> <a href="mailto:${item.email}" class="text-blue-600 hover:underline">${item.email}</a></p>`;
+                        }
+                        if (item.schedule) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Horário:</span> ${item.schedule}</p>`;
+                        }
+                        if (item.notes) {
+                            contactDetails.innerHTML += `<p class="italic text-sm mt-2">${item.notes}</p>`;
+                        }
+                        if (item.telegram) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Telegram:</span> ${item.telegram}</p>`;
+                        }
+                        if (item.level) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Nível:</span> ${item.level}</p>`;
+                        }
+                        if (item.contact_person && !item.name) { // Para casos onde o nome principal é o contact_person
+                             contactDetails.innerHTML += `<p><span class="font-semibold">Pessoa de Contato:</span> ${item.contact_person}</p>`;
+                        }
+                        if (item.sla) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">SLA:</span> ${item.sla}</p>`;
+                        }
+                        if (item.chatBot) {
+                            contactDetails.innerHTML += `<p><span class="font-semibold">Chatbot:</span> ${item.chatBot}</p>`;
+                        }
+
+
+                        // Lidar com subContatos (ex: Líderes)
+                        if (item.subContacts && item.subContacts.length > 0) {
+                            contactDetails.innerHTML += `<p class="font-semibold mt-3">Sub-contatos:</p>`;
+                            item.subContacts.forEach(subContact => {
+                                renderContactOrSubcategory(subContact, contactDetails, true);
+                            });
+                        }
+
+                        // Lidar com subCategories (ex: Níveis da Vivo)
+                        if (item.subCategories && item.subCategories.length > 0) {
+                            contactDetails.innerHTML += `<p class="font-semibold mt-3">Detalhes:</p>`;
+                            item.subCategories.forEach(subCategory => {
+                                renderContactOrSubcategory(subCategory, contactDetails, true);
+                            });
+                        }
+
+                        // Lidar com mesaOperadora (Centro de Atendimento)
+                        if (item.mesaOperadora) {
+                            contactDetails.innerHTML += `<p class="font-semibold mt-3">Mesa Operadora:</p>`;
                             contactDetails.innerHTML += `<div class="ml-4 border-l-2 border-gray-200 pl-3 py-1">`;
-                            contactDetails.innerHTML += `<p><span class="font-medium">${subContact.name}</span></p>`;
-                            if (subContact.schedule) {
-                                contactDetails.innerHTML += `<p class="text-sm">Horário: ${subContact.schedule}</p>`;
+                            if (item.mesaOperadora.description) {
+                                contactDetails.innerHTML += `<p>${item.mesaOperadora.description}</p>`;
                             }
-                            if (subContact.mobile) {
-                                contactDetails.innerHTML += `<p class="text-sm">Celular: <a href="${formatPhoneNumberForLink(subContact.mobile)}" class="text-blue-600 hover:underline">${subContact.mobile}</a></p>`;
+                            if (item.mesaOperadora.phone) {
+                                contactDetails.innerHTML += `<p>Telefone: <a href="${formatPhoneNumberForLink(item.mesaOperadora.phone)}" class="text-blue-600 hover:underline">${item.mesaOperadora.phone}</a></p>`;
                             }
                             contactDetails.innerHTML += `</div>`;
+                        }
+
+                        contactItem.appendChild(contactDetails);
+                        parentElement.appendChild(contactItem);
+
+                        // Adiciona evento de clique para expandir/colapsar
+                        contactHeader.addEventListener('click', () => {
+                            contactDetails.classList.toggle('open');
                         });
                     }
 
-                    // Lidar com mesaOperadora (Centro de Atendimento)
-                    if (contact.mesaOperadora) {
-                        contactDetails.innerHTML += `<p class="font-semibold mt-3">Mesa Operadora:</p>`;
-                        contactDetails.innerHTML += `<div class="ml-4 border-l-2 border-gray-200 pl-3 py-1">`;
-                        if (contact.mesaOperadora.description) {
-                            contactDetails.innerHTML += `<p>${contact.mesaOperadora.description}</p>`;
-                        }
-                        if (contact.mesaOperadora.phone) {
-                            contactDetails.innerHTML += `<p>Telefone: <a href="${formatPhoneNumberForLink(contact.mesaOperadora.phone)}" class="text-blue-600 hover:underline">${contact.mesaOperadora.phone}</a></p>`;
-                        }
-                        contactDetails.innerHTML += `</div>`;
-                    }
-
-                    contactItem.appendChild(contactDetails);
-                    categorySection.appendChild(contactItem);
-
-                    // Adiciona evento de clique para expandir/colapsar
-                    contactHeader.addEventListener('click', () => {
-                        contactDetails.classList.toggle('open');
+                    categoryData.contacts.forEach(contact => {
+                        renderContactOrSubcategory(contact, categorySection);
                     });
+                    companySection.appendChild(categorySection);
                 });
-                contactListDiv.appendChild(categorySection);
+                contactListDiv.appendChild(companySection);
             });
         }
 
