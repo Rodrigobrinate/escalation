@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Contatos NOC Claro Brasil</title>
+    <!-- Inclui Tailwind CSS para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinha ao topo para melhor visualização em telas menores */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+        .contact-item-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .contact-item-details.open {
+            max-height: 500px; /* Ajuste conforme necessário para o conteúdo */
+            transition: max-height 0.7s ease-in;
+        }
+        .category-title {
+            position: sticky;
+            top: 0;
+            background-color: #ffffff;
+            z-index: 10;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="container bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Lista de Escalonamento: NOC Claro Brasil</h1>
+
+        <!-- Botão para mostrar/esconder a lista -->
+        <button id="toggleListButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 mb-6">
+            Mostrar Lista de Contatos
+        </button>
+
+        <!-- Container da lista de empresas/contatos -->
+        <div id="contactList" class="hidden space-y-4">
+            <!-- Conteúdo será gerado aqui pelo JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Dados JSON com as informações dos contatos
+        const companyData = [
+          {
+            "category": "PROCESSOS GMUD",
+            "contacts": [
+              {
+                "name": "Marcos de Avila de Jesus",
+                "role": "Diretor de Redes NOC",
+                "phone": "+55 11 2111-2499",
+                "mobile": "+55 11 97666-6436",
+                "email": "marcio.avila@claro.com.br"
+              },
+              {
+                "name": "Fernanda Barbosa de Cavalcanti Mello",
+                "role": "Gerente de Integração e Gestão Operacional",
+                "phone": "+55 21 2121-9476",
+                "mobile": "+55 21 97632-3076",
+                "email": "fernanda.mello@claro.com.br"
+              },
+              {
+                "name": "Claudia de Araújo Cardoso",
+                "role": "Coordenadora de GMUD",
+                "phone": "+55 21 2121-8117",
+                "mobile": "+55 21 99222-8924",
+                "email": "claudia.cardoso@claro.com.br"
+              },
+              {
+                "name": "Transport Network Tech. Sup. [8X5]",
+                "role": "(Centro Nacional de Transmissão)",
+                "email": "cntx@claro.com.br"
+              }
+            ]
+          },
+          {
+            "category": "OPERAÇÕES NOC",
+            "contacts": [
+              {
+                "name": "Ricardo Abud Ribeiro",
+                "role": "Gerente de Redes NOC",
+                "phone": "+55 11 2121-2927",
+                "mobile": "+55 11 99202-8147",
+                "email": "ricardo.abud@claro.com.br"
+              },
+              {
+                "name": "Francisco Manoel e Silva",
+                "role": "Gerente de Serviços de Telecom",
+                "phone": "+55 21 2121-2624",
+                "mobile": "+55 21 99222-7970",
+                "email": "francisco.manoel@claro.com.br"
+              },
+              {
+                "name": "Fabio Torres Maximiano",
+                "role": "Gerente de Serviços de Telecom",
+                "phone": "+55 21 2121-3022",
+                "mobile": "+55 21 97629-9141",
+                "email": "fabio.maximiano@claro.com.br"
+              },
+              {
+                "name": "Líder",
+                "subContacts": [
+                  {
+                    "name": "Denison Sena",
+                    "schedule": "2ª à 6ª feiras - 07h00 às 16h00",
+                    "mobile": "+55 21 99215-3921"
+                  },
+                  {
+                    "name": "Rogerio Barbosa",
+                    "schedule": "2ª à 6ª feiras - 10h00 às 19h00",
+                    "mobile": "+55 11 94711-1132"
+                  },
+                  {
+                    "name": "Luciano Medeiros",
+                    "schedule": "2ª à 6ª feiras - 13h00 às 22h00",
+                    "mobile": "+55 11 94721-2923"
+                  },
+                  {
+                    "name": "Gilberto Filadelfo",
+                    "schedule": "2ª à 6ª feiras - 22h00 às 07h00",
+                    "mobile": "+55 21 99385-0415"
+                  },
+                  {
+                    "name": "Sábados e Domingos",
+                    "schedule": "10h00 às 19h00",
+                    "mobile": "+55 21 2323-5425"
+                  }
+                ],
+                "notes": "OBS.: Demais horários, recorrer ao nível acima."
+              },
+              {
+                "name": "Centro de Atendimento a Operadoras [24x7]",
+                "description": "Centro de Operações da Rede de Transporte (Execução de GMUD)",
+                "phone": "0800 704 0041",
+                "mesaOperadora": {
+                  "description": "Mesa Operadora (Abertura de Chamados)",
+                  "phone": "0800 704 4617"
+                },
+                "whatsapp": "+55 21 97361-3969",
+                "email": "noctxrl@claro.com.br; mesadecontrole-l@embratel.net.br"
+              }
+            ]
+          }
+        ];
+
+        const contactListDiv = document.getElementById('contactList');
+        const toggleListButton = document.getElementById('toggleListButton');
+
+        // Função para formatar o número de telefone para o link tel:
+        function formatPhoneNumberForLink(phoneNumber) {
+            // Remove todos os caracteres não numéricos, exceto o '+' inicial
+            return 'tel:' + phoneNumber.replace(/[^\d+]/g, '');
+        }
+
+        // Função para renderizar os contatos
+        function renderContacts() {
+            contactListDiv.innerHTML = ''; // Limpa o conteúdo existente
+
+            companyData.forEach(categoryData => {
+                // Cria um div para a categoria
+                const categorySection = document.createElement('div');
+                categorySection.className = 'mb-6';
+
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.className = 'category-title text-2xl font-semibold text-gray-700 mb-4 pb-2 border-b-2 border-blue-500';
+                categoryTitle.textContent = categoryData.category;
+                categorySection.appendChild(categoryTitle);
+
+                categoryData.contacts.forEach(contact => {
+                    const contactItem = document.createElement('div');
+                    contactItem.className = 'bg-gray-50 p-4 rounded-lg shadow-sm mb-3 cursor-pointer hover:bg-gray-100 transition duration-200 ease-in-out';
+
+                    const contactHeader = document.createElement('div');
+                    contactHeader.className = 'flex justify-between items-center';
+                    contactHeader.innerHTML = `<h3 class="text-lg font-medium text-gray-800">${contact.name}</h3>`;
+                    contactItem.appendChild(contactHeader);
+
+                    const contactDetails = document.createElement('div');
+                    contactDetails.className = 'contact-item-details mt-2 text-gray-600';
+
+                    if (contact.role) {
+                        contactDetails.innerHTML += `<p><span class="font-semibold">Cargo:</span> ${contact.role}</p>`;
+                    }
+                    if (contact.description) {
+                        contactDetails.innerHTML += `<p><span class="font-semibold">Descrição:</span> ${contact.description}</p>`;
+                    }
+                    if (contact.phone) {
+                        contactDetails.innerHTML += `<p><span class="font-semibold">Telefone:</span> <a href="${formatPhoneNumberForLink(contact.phone)}" class="text-blue-600 hover:underline">${contact.phone}</a></p>`;
+                    }
+                    if (contact.mobile) {
+                        contactDetails.innerHTML += `<p><span class="font-semibold">Celular:</span> <a href="${formatPhoneNumberForLink(contact.mobile)}" class="text-blue-600 hover:underline">${contact.mobile}</a></p>`;
+                    }
+                    if (contact.whatsapp) {
+                        // Link direto para WhatsApp, se aplicável
+                        const whatsappNumber = contact.whatsapp.replace(/[^\d]/g, ''); // Remove caracteres não numéricos
+                        contactDetails.innerHTML += `<p><span class="font-semibold">WhatsApp:</span> <a href="https://wa.me/${whatsappNumber}" target="_blank" class="text-green-600 hover:underline">${contact.whatsapp}</a></p>`;
+                    }
+                    if (contact.email) {
+                        contactDetails.innerHTML += `<p><span class="font-semibold">E-mail:</span> <a href="mailto:${contact.email}" class="text-blue-600 hover:underline">${contact.email}</a></p>`;
+                    }
+                    if (contact.schedule) {
+                        contactDetails.innerHTML += `<p><span class="font-semibold">Horário:</span> ${contact.schedule}</p>`;
+                    }
+                    if (contact.notes) {
+                        contactDetails.innerHTML += `<p class="italic text-sm mt-2">${contact.notes}</p>`;
+                    }
+
+                    // Lidar com subContatos (ex: Líderes)
+                    if (contact.subContacts && contact.subContacts.length > 0) {
+                        contactDetails.innerHTML += `<p class="font-semibold mt-3">Sub-contatos:</p>`;
+                        contact.subContacts.forEach(subContact => {
+                            contactDetails.innerHTML += `<div class="ml-4 border-l-2 border-gray-200 pl-3 py-1">`;
+                            contactDetails.innerHTML += `<p><span class="font-medium">${subContact.name}</span></p>`;
+                            if (subContact.schedule) {
+                                contactDetails.innerHTML += `<p class="text-sm">Horário: ${subContact.schedule}</p>`;
+                            }
+                            if (subContact.mobile) {
+                                contactDetails.innerHTML += `<p class="text-sm">Celular: <a href="${formatPhoneNumberForLink(subContact.mobile)}" class="text-blue-600 hover:underline">${subContact.mobile}</a></p>`;
+                            }
+                            contactDetails.innerHTML += `</div>`;
+                        });
+                    }
+
+                    // Lidar com mesaOperadora (Centro de Atendimento)
+                    if (contact.mesaOperadora) {
+                        contactDetails.innerHTML += `<p class="font-semibold mt-3">Mesa Operadora:</p>`;
+                        contactDetails.innerHTML += `<div class="ml-4 border-l-2 border-gray-200 pl-3 py-1">`;
+                        if (contact.mesaOperadora.description) {
+                            contactDetails.innerHTML += `<p>${contact.mesaOperadora.description}</p>`;
+                        }
+                        if (contact.mesaOperadora.phone) {
+                            contactDetails.innerHTML += `<p>Telefone: <a href="${formatPhoneNumberForLink(contact.mesaOperadora.phone)}" class="text-blue-600 hover:underline">${contact.mesaOperadora.phone}</a></p>`;
+                        }
+                        contactDetails.innerHTML += `</div>`;
+                    }
+
+                    contactItem.appendChild(contactDetails);
+                    categorySection.appendChild(contactItem);
+
+                    // Adiciona evento de clique para expandir/colapsar
+                    contactHeader.addEventListener('click', () => {
+                        contactDetails.classList.toggle('open');
+                    });
+                });
+                contactListDiv.appendChild(categorySection);
+            });
+        }
+
+        // Event listener para o botão de alternar a lista
+        toggleListButton.addEventListener('click', () => {
+            if (contactListDiv.classList.contains('hidden')) {
+                renderContacts(); // Renderiza os contatos apenas quando a lista é mostrada
+                contactListDiv.classList.remove('hidden');
+                toggleListButton.textContent = 'Esconder Lista de Contatos';
+            } else {
+                contactListDiv.classList.add('hidden');
+                toggleListButton.textContent = 'Mostrar Lista de Contatos';
+            }
+        });
+
+        // Opcional: Renderizar a lista ao carregar a página se quiser que ela comece aberta
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     renderContacts();
+        //     contactListDiv.classList.remove('hidden');
+        //     toggleListButton.textContent = 'Esconder Lista de Contatos';
+        // });
+    </script>
+</body>
+</html>
