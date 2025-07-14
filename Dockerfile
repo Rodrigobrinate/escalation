@@ -6,7 +6,7 @@ FROM nginx:alpine
 COPY . /usr/share/nginx/html
 
 # Expõe a porta 80, que é a porta padrão do Nginx
-EXPOSE 80
+EXPOSE 3335
 
 # Comando para iniciar o Nginx quando o contêiner for executado
 CMD ["nginx", "-g", "daemon off;"]
