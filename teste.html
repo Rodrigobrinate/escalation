@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Telecom - O Futuro da Conexão</title>
+    
+    <!-- Tailwind CSS para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilização customizada */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            overflow-x: hidden;
+        }
+
+        /* Container para a cena 3D, fixo ao fundo */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        /* Garante que o conteúdo de texto fique sobre a animação */
+        .content-section {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .content-section h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .content-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+        }
+
+        .content-section p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Estilo do botão flutuante do WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #25d366;
+        }
+        .whatsapp-float i {
+            margin-top: 15px;
+        }
+
+        /* Estilos do Pop-up de Chat */
+        #chat-popup {
+            display: none;
+            position: fixed;
+            bottom: 120px;
+            right: 40px;
+            width: 350px;
+            max-width: 90%;
+            height: 500px;
+            background-color: #1a1a1a;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+            flex-direction: column;
+            z-index: 100;
+            overflow: hidden;
+            transform: scale(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #chat-popup.open {
+            display: flex;
+            transform: scale(1);
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .chat-body {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-message {
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+        .chat-message.user {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .chat-message.bot {
+            background-color: #333;
+            color: #f0f0f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .chat-footer {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #333;
+        }
+        #chat-input {
+            flex-grow: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            background-color: #333;
+            color: #f0f0f0;
+        }
+        #chat-send-btn {
+            background: #007bff;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #chat-send-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Botão para abrir o chat */
+        .chat-open-button {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 120px; /* Posição à esquerda do botão do WhatsApp */
+            background-color: #007bff;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 28px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            z-index: 99;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .chat-open-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #007bff;
+        }
+        .chat-open-button i {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- O Canvas onde a cena 3D será renderizada -->
+    <canvas id="canvas-container"></canvas>
+
+    <!-- Conteúdo da Página -->
+    <main>
+        <section class="content-section text-center">
+            <h1>O Futuro da Conexão. Agora.</h1>
+            <p class="mt-4 text-lg">Navegue em ultravelocidade com a tecnologia de fibra óptica que redefine sua experiência online.</p>
+            <p class="mt-2 text-sm text-gray-400">Role para explorar</p>
+        </section>
+
+        <section class="content-section text-left">
+            <h2>Velocidade sem Limites</h2>
+            <p>Nossos planos são desenhados para quem não aceita menos que o máximo. Downloads, streaming em 4K, jogos online sem lag e trabalho remoto sem interrupções. A estabilidade que você precisa com a velocidade que você deseja.</p>
+        </section>
+
+        <section class="content-section text-right">
+            <h2>Tecnologia de Ponta</h2>
+            <p>Investimos na mais avançada infraestrutura de fibra óptica para levar até você uma conexão pura, estável e segura. Nossa rede é monitorada 24/7 para garantir performance constante, não importa a hora do dia.</p>
+        </section>
+
+        <section class="content-section text-center">
+            <h2>Pronto para decolar?</h2>
+            <p>Escolha o plano ideal para você e junte-se à revolução da conectividade. Nossa equipe está pronta para te atender.</p>
+            <button class="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300">
+                Conheça os Planos
+            </button>
+        </section>
+    </main>
+
+    <!-- Botão Flutuante para Abrir o Chat -->
+    <button class="chat-open-button" id="toggle-chat-btn">
+        <i class="fa-solid fa-comment-dots"></i>
+    </button>
+
+    <!-- Pop-up de Chat -->
+    <div id="chat-popup">
+        <div class="chat-header">
+            <span>Fale com um especialista</span>
+            <button class="chat-close-btn" id="chat-close-btn">&times;</button>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="chat-message bot">Olá! Como posso ajudar você hoje?</div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+            <button id="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante do WhatsApp -->
+    <a href="https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20mais%20informações%20sobre%20os%20planos." class="whatsapp-float" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- Bibliotecas JavaScript para 3D e Animação -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+
+    <script type="module">
+        // --- Configuração da Cena 3D (Three.js) ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.querySelector('#canvas-container'),
+            alpha: true // Fundo transparente
+        });
+
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.setZ(5);
+
+        // --- Objetos 3D ---
+
+        // 1. Objeto principal (Torus Knot) - Representa o "núcleo" da rede
+        const geometry = new THREE.TorusKnotGeometry(1.5, 0.2, 200, 20);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x007bff,
+            metalness: 0.8,
+            roughness: 0.2
+        });
+        const torusKnot = new THREE.Mesh(geometry, material);
+        scene.add(torusKnot);
+
+        // 2. Partículas (Estrelas) - Representam os dados fluindo
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 5000;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 20;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.015,
+            color: 0xffffff
+        });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        // --- Iluminação ---
+        const pointLight = new THREE.PointLight(0xffffff, 1.5);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        const ambientLight = new THREE.AmbientLight(0x404040, 2);
+        scene.add(ambientLight);
+
+        // --- Animações com Scroll (GSAP) ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: 'main',
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1.5, // Suaviza a animação de scroll
+            }
+        });
+
+        tl.to(torusKnot.rotation, { x: 4, y: 6, z: 2 })
+          .to(camera.position, { z: 2.5 }, 0) // Zoom in no início
+          .to(camera.position, { z: 8 }, 0.5) // Zoom out no meio
+          .to(camera.position, { x: 3 }, 0.7) // Move para a direita
+          .to(camera.position, { x: 0, z: 5 }, 1); // Retorna ao centro
+
+        // --- Loop de Animação e Responsividade ---
+        const clock = new THREE.Clock();
+        function animate() {
+            const elapsedTime = clock.getElapsedTime();
+
+            // Animação contínua dos objetos
+            torusKnot.rotation.y = 0.5 * elapsedTime;
+            particlesMesh.rotation.y = -0.05 * elapsedTime;
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- Lógica do Chat ---
+        const chatPopup = document.getElementById('chat-popup');
+        const toggleChatBtn = document.getElementById('toggle-chat-btn');
+        const closeChatBtn = document.getElementById('chat-close-btn');
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatBody = document.getElementById('chat-body');
+
+        toggleChatBtn.addEventListener('click', () => {
+            chatPopup.classList.toggle('open');
+        });
+
+        closeChatBtn.addEventListener('click', () => {
+            chatPopup.classList.remove('open');
+        });
+
+        const sendMessage = () => {
+            const messageText = chatInput.value.trim();
+            if (messageText === '') return;
+
+            // Adiciona a mensagem do usuário
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('chat-message', 'user');
+            userMessage.textContent = messageText;
+            chatBody.appendChild(userMessage);
+
+            chatInput.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight; // Auto-scroll
+
+            // Simula uma resposta do bot
+            setTimeout(() => {
+                const botMessage = document.createElement('div');
+                botMessage.classList.add('chat-message', 'bot');
+                botMessage.textContent = "Obrigado por sua mensagem! Um de nossos especialistas responderá em breve.";
+                chatBody.appendChild(botMessage);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 1000);
+        };
+
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+    </script>
+</body>
+</html>
