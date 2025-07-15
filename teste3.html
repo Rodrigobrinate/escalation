@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,12 +18,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <style>
-        /* Estilos customizados e overrides */
+        /* Estilos customizados e animações que não são facilmente feitas com Tailwind */
+        html {
+            scroll-behavior: smooth;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            @apply bg-white text-gray-800;
-            @apply dark:bg-gray-900 dark:text-gray-200;
-            scroll-behavior: smooth;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
@@ -45,12 +45,6 @@
              background-image: 
                 linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-        }
-
-        /* Gradiente sutil */
-        .subtle-gradient {
-            @apply bg-gradient-to-b from-white to-gray-50;
-            @apply dark:from-gray-900 dark:to-gray-900/90;
         }
 
         /* Efeito de preenchimento fluido no botão */
@@ -103,27 +97,12 @@
 
         /* Animação do ícone de scroll */
         @keyframes scroll-bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-20px);
-            }
-            60% {
-                transform: translateY(-10px);
-            }
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
         }
         .scroll-indicator {
             animation: scroll-bounce 2s infinite;
-        }
-        
-        /* Esconde a scrollbar */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
         }
         
         /* Ícone flutuante do WhatsApp */
@@ -148,27 +127,33 @@
         .whatsapp-float:hover {
             transform: scale(1.1);
         }
+
+        /* Pop-up de Chat */
+        #chat-popup-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #chat-popup {
+            transition: transform 0.3s ease-in-out;
+        }
     </style>
     <script>
-        // Aplica o tema salvo no localStorage antes do carregamento da página para evitar flash
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-        
-        // Configuração do Tailwind para modo escuro
+        // Configuração do Tailwind para modo escuro via 'class'
         tailwind.config = {
           darkMode: 'class',
-          theme: {
-            extend: {
-              // ... suas extensões de tema
-            }
-          }
         }
+
+        // Aplica o tema salvo no localStorage ou do sistema antes do carregamento da página
+        const applyTheme = () => {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+        }
+        applyTheme();
     </script>
 </head>
-<body class="overflow-x-hidden">
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 overflow-x-hidden">
 
     <div class="background-grid"></div>
 
@@ -177,7 +162,7 @@
         <div class="container mx-auto flex justify-between items-center">
             <!-- Logo -->
             <div class="text-2xl font-bold tracking-wider logo-anim text-gray-900 dark:text-white">
-                TUD<span class="text-indigo-600">O</span>
+                TUD<span class="text-indigo-600 dark:text-indigo-500">O</span>
             </div>
             <!-- Navegação Desktop -->
             <div class="flex items-center">
@@ -234,7 +219,7 @@
         </section>
 
         <!-- ===== 3. PROJETOS / CASES ===== -->
-        <section id="projetos" class="py-20 md:py-32 subtle-gradient">
+        <section id="projetos" class="py-20 md:py-32 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-900/90">
             <div class="container mx-auto px-6">
                 <h2 class="section-title text-center text-3xl md:text-4xl font-light mb-16 tracking-wider text-gray-900 dark:text-white">PROJETOS EM DESTAQUE</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
@@ -317,7 +302,7 @@
         </section>
 
         <!-- ===== NOVA SEÇÃO: CDN ===== -->
-        <section id="cdn" class="py-20 md:py-32 subtle-gradient">
+        <section id="cdn" class="py-20 md:py-32 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-900/90">
             <div class="container mx-auto px-6 text-center">
                 <h2 class="section-title text-3xl md:text-4xl font-light mb-4 tracking-wider text-gray-900 dark:text-white">CDN: CONTEÚDO NA VELOCIDADE DA LUZ</h2>
                 <p class="text-gray-600 dark:text-gray-400 mb-16 max-w-3xl mx-auto">Estamos diretamente conectados às maiores redes de distribuição de conteúdo do mundo para garantir latência mínima e performance máxima.</p>
@@ -447,8 +432,8 @@
     </a>
 
     <!-- ===== Pop-up de Chat para Email ===== -->
-    <div id="chat-popup-overlay" class="chat-popup-overlay fixed top-0 left-0 w-full h-full bg-black/50 backdrop-blur-sm z-[999] opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="chat-popup" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-95 w-[90%] max-w-md bg-white dark:bg-gray-900 rounded-2xl p-8 z-[1000] transition-transform duration-300 shadow-2xl dark:shadow-black/50">
+    <div id="chat-popup-overlay" class="fixed top-0 left-0 w-full h-full bg-black/50 backdrop-blur-sm z-[999] opacity-0 pointer-events-none">
+        <div id="chat-popup" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-95 w-[90%] max-w-md bg-white dark:bg-gray-900 rounded-2xl p-8 z-[1000] shadow-2xl dark:shadow-black/50">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-light text-gray-800 dark:text-white">Entre em Contato</h3>
                 <button id="close-chat-popup" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-3xl">&times;</button>
@@ -484,43 +469,27 @@
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-        // Altera os ícones dentro do botão com base no tema atual
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            themeToggleLightIcon.classList.remove('hidden');
-        } else {
-            themeToggleDarkIcon.classList.remove('hidden');
-        }
-
-        themeToggleBtn.addEventListener('click', function() {
-            // alterna ícones
-            themeToggleDarkIcon.classList.toggle('hidden');
-            themeToggleLightIcon.classList.toggle('hidden');
-
-            // se o tema foi salvo no localStorage, alterna-o
-            if (localStorage.getItem('theme')) {
-                if (localStorage.getItem('theme') === 'light') {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                }
-            // se não, verifica o tema do sistema e o define no localStorage
+        const updateThemeIcons = () => {
+            if (document.documentElement.classList.contains('dark')) {
+                themeToggleDarkIcon.classList.add('hidden');
+                themeToggleLightIcon.classList.remove('hidden');
             } else {
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                }
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
             }
+        };
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcons();
         });
+
+        updateThemeIcons(); // Define o ícone correto no carregamento inicial
 
         // --- Animações com GSAP ---
         gsap.registerPlugin(ScrollTrigger);
 
-        // Animação do Header
         gsap.from("#header", { y: -100, opacity: 0, duration: 1, ease: 'power3.out' });
         gsap.from(".hero-title span", { y: 50, opacity: 0, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.5 });
         gsap.from(".hero-subtitle", { y: 30, opacity: 0, duration: 1, ease: 'power3.out', delay: 1 });
@@ -586,12 +555,12 @@
         const chatPopup = document.getElementById('chat-popup');
         
         const openPopup = () => {
-            popupOverlay.classList.add('active');
-            chatPopup.classList.add('active');
+            popupOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            chatPopup.classList.remove('scale-95');
         };
         const closePopup = () => {
-            popupOverlay.classList.remove('active');
-            chatPopup.classList.remove('active');
+            popupOverlay.classList.add('opacity-0', 'pointer-events-none');
+            chatPopup.classList.add('scale-95');
         };
 
         openPopupButton.addEventListener('click', openPopup);
@@ -604,12 +573,12 @@
 
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            contactForm.style.display = 'none';
+            contactForm.classList.add('hidden');
             successMessage.classList.remove('hidden');
             setTimeout(() => {
                 closePopup();
                 setTimeout(() => { // Aguarda a transição de fechamento
-                    contactForm.style.display = 'block';
+                    contactForm.classList.remove('hidden');
                     successMessage.classList.add('hidden');
                     contactForm.reset();
                 }, 300);
