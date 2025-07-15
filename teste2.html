@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUDDO - Construindo o Futuro da Conectividade</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- GSAP (GreenSock Animation Platform) & ScrollTrigger Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* Estilos customizados e overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e7eb; /* gray-200 */
+            scroll-behavior: smooth;
+        }
+
+        /* Linhas finas de fundo */
+        .background-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 80px 80px;
+            opacity: 0.5;
+        }
+
+        /* Gradiente sutil */
+        .subtle-gradient {
+            background-image: linear-gradient(180deg, rgba(10, 10, 10, 0) 0%, rgba(17, 24, 39, 0.5) 100%);
+        }
+
+        /* Efeito de preenchimento fluido no botão */
+        .btn-fill {
+            position: relative;
+            overflow: hidden;
+            transition: color 0.4s ease-in-out;
+            z-index: 1;
+        }
+        .btn-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #4f46e5; /* indigo-600 */
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease-in-out;
+            z-index: -1;
+        }
+        .btn-fill:hover {
+            color: #ffffff;
+        }
+        .btn-fill:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Animação da borda do card */
+        .card-border-animate {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-border-animate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4f46e5);
+            transition: left 0.5s ease;
+        }
+        .card-border-animate:hover::before {
+            left: 100%;
+        }
+
+        /* Animação do ícone de scroll */
+        @keyframes scroll-bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        .scroll-indicator {
+            animation: scroll-bounce 2s infinite;
+        }
+        
+        /* Esconde a scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <div class="background-grid"></div>
+
+    <!-- ===== HEADER / NAVEGAÇÃO ===== -->
+    <header id="header" class="fixed top-0 left-0 w-full p-6 z-50 transition-all duration-300">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <div class="text-2xl font-bold tracking-wider logo-anim">
+                TUD<span class="text-indigo-500">O</span>
+            </div>
+            <!-- Navegação Desktop -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-light tracking-widest">
+                <a href="#sobre" class="nav-link hover:text-indigo-400 transition-colors duration-300">SOBRE</a>
+                <a href="#projetos" class="nav-link hover:text-indigo-400 transition-colors duration-300">PROJETOS</a>
+                <a href="#servicos" class="nav-link hover:text-indigo-400 transition-colors duration-300">SERVIÇOS</a>
+                <a href="#contato" class="nav-link bg-indigo-600/20 text-white py-2 px-4 rounded-full hover:bg-indigo-600/40 transition-colors duration-300">CONTATO</a>
+            </nav>
+            <!-- Menu Mobile (Ícone) -->
+            <button id="mobile-menu-button" class="md:hidden z-50">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Menu Mobile (Painel) -->
+    <div id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-black/90 backdrop-blur-sm z-40 flex flex-col items-center justify-center space-y-8 text-xl tracking-widest transform translate-x-full transition-transform duration-300 ease-in-out">
+        <a href="#sobre" class="mobile-nav-link">SOBRE</a>
+        <a href="#projetos" class="mobile-nav-link">PROJETOS</a>
+        <a href="#servicos" class="mobile-nav-link">SERVIÇOS</a>
+        <a href="#contato" class="mobile-nav-link">CONTATO</a>
+    </div>
+
+    <main>
+        <!-- ===== 1. HERO SECTION ===== -->
+        <section id="hero" class="h-screen flex flex-col justify-center items-center text-center relative p-4">
+            <h1 class="text-4xl md:text-7xl lg:text-8xl font-thin tracking-wider leading-tight hero-title">
+                <span class="block">CONSTRUINDO O FUTURO</span>
+                <span class="block text-indigo-400">DA CONECTIVIDADE</span>
+            </h1>
+            <p class="text-gray-400 mt-6 text-lg md:text-xl max-w-2xl hero-subtitle">Inovação, performance e design para transformar ideias em realidade digital.</p>
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 scroll-indicator">
+                <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+        </section>
+
+        <!-- ===== 2. SOBRE / MANIFESTO ===== -->
+        <section id="sobre" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 max-w-3xl text-center">
+                <h2 class="section-title text-3xl md:text-4xl font-light mb-8 tracking-wider">NOSSO MANIFESTO</h2>
+                <div class="manifesto-text text-lg md:text-xl text-gray-300 leading-relaxed space-y-4 font-light" style="letter-spacing: 0.5px;">
+                    <p class="manifesto-line">Acreditamos que a tecnologia é uma força para a simplicidade, não para a complexidade.</p>
+                    <p class="manifesto-line">Cada projeto é uma oportunidade de desafiar o status quo e criar experiências que importam.</p>
+                    <p class="manifesto-line">Somos movidos pela curiosidade, guiados pela estratégia e obcecados pela excelência em cada detalhe.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 3. PROJETOS / CASES ===== -->
+        <section id="projetos" class="py-20 md:py-32 subtle-gradient">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title text-center text-3xl md:text-4xl font-light mb-16 tracking-wider">PROJETOS EM DESTAQUE</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    <!-- Card de Projeto 1 -->
+                    <div class="project-card bg-gray-900/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-900/50 card-border-animate">
+                        <img src="http://googleusercontent.com/file_content/0" alt="Projeto de otimização de custos" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-400">Otimização de Custos</h3>
+                            <p class="text-gray-400 mt-2 font-light">Tecnologias avançadas para simplificar processos e maximizar recursos de rede.</p>
+                        </div>
+                    </div>
+                    <!-- Card de Projeto 2 -->
+                    <div class="project-card bg-gray-900/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-900/50 card-border-animate">
+                        <img src="http://googleusercontent.com/file_content/1" alt="Projeto preparando a rede para o futuro" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-400">Redes do Futuro</h3>
+                            <p class="text-gray-400 mt-2 font-light">Infraestrutura preparada para as demandas de realidade virtual e novas tecnologias.</p>
+                        </div>
+                    </div>
+                    <!-- Card de Projeto 3 -->
+                    <div class="project-card bg-gray-900/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-900/50 card-border-animate">
+                        <img src="http://googleusercontent.com/file_content/2" alt="Projeto de Customer Experience" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-400">Customer Experience (CX)</h3>
+                            <p class="text-gray-400 mt-2 font-light">Infraestrutura sólida e suporte ágil como diferencial competitivo.</p>
+                        </div>
+                    </div>
+                    <!-- Card de Projeto 4 -->
+                    <div class="project-card bg-gray-900/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-900/50 card-border-animate">
+                        <img src="http://googleusercontent.com/file_content/3" alt="Projeto de Conexão Inteligente" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-400">Conexão Inteligente com IXPs</h3>
+                            <p class="text-gray-400 mt-2 font-light">Soluções de peering para otimizar rotas e melhorar a qualidade da conexão.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 4. SERVIÇOS / CAPACIDADES ===== -->
+        <section id="servicos" class="py-20 md:py-32">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title text-center text-3xl md:text-4xl font-light mb-16 tracking-wider">NOSSAS CAPACIDADES</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                    <!-- Serviço 1 -->
+                    <div class="service-item">
+                        <div class="flex justify-center mb-4">
+                            <svg class="animated-svg w-16 h-16 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.311a15.045 15.045 0 01-7.5 0C4.508 19.64 2.25 15.223 2.25 10.5 2.25 5.806 6.306 2 12 2s9.75 3.806 9.75 8.5c0 4.723-2.258 9.14-6.75 9.811z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-medium mb-2">Estratégia Digital</h3>
+                        <p class="text-gray-400 font-light">Planejamento e consultoria para garantir que sua tecnologia gere resultados de negócio.</p>
+                    </div>
+                    <!-- Serviço 2 -->
+                    <div class="service-item">
+                        <div class="flex justify-center mb-4">
+                            <svg class="animated-svg w-16 h-16 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-medium mb-2">Desenvolvimento Sob Medida</h3>
+                        <p class="text-gray-400 font-light">Criação de soluções de software e infraestrutura perfeitamente alinhadas às suas necessidades.</p>
+                    </div>
+                    <!-- Serviço 3 -->
+                    <div class="service-item">
+                        <div class="flex justify-center mb-4">
+                            <svg class="animated-svg w-16 h-16 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.572L16.5 21.75l-.398-1.178a3.375 3.375 0 00-2.455-2.456L12.75 18l1.178-.398a3.375 3.375 0 002.455-2.456L16.5 14.25l.398 1.178a3.375 3.375 0 002.456 2.456L20.25 18l-1.178.398a3.375 3.375 0 00-2.456 2.456z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-medium mb-2">Experiência do Usuário (UX/UI)</h3>
+                        <p class="text-gray-400 font-light">Design de interfaces intuitivas e experiências memoráveis que cativam e convertem.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ===== 5. PARCEIROS / CLIENTES ===== -->
+        <section id="parceiros" class="py-20 md:py-24 bg-gray-900/50">
+            <div class="container mx-auto px-6">
+                 <h2 class="section-title text-center text-3xl md:text-4xl font-light mb-16 tracking-wider">QUEM CONFIA EM NÓS</h2>
+                 <div class="relative w-full overflow-hidden">
+                    <div class="flex animate-marquee">
+                        <div class="flex w-max items-center justify-center space-x-16 lg:space-x-24">
+                            <!-- Logos dos parceiros -->
+                            <img src="https://tailwindui.com/img/logos/158x48/transistor-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="Transistor">
+                            <img src="https://tailwindui.com/img/logos/158x48/reform-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="Reform">
+                            <img src="https://tailwindui.com/img/logos/158x48/tuple-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="Tuple">
+                            <img src="https://tailwindui.com/img/logos/158x48/savvycal-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="SavvyCal">
+                            <img src="https://tailwindui.com/img/logos/158x48/statamic-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="Statamic">
+                            <!-- Logos duplicados para efeito contínuo -->
+                            <img src="https://tailwindui.com/img/logos/158x48/transistor-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="Transistor">
+                            <img src="https://tailwindui.com/img/logos/158x48/reform-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="Reform">
+                            <img src="https://tailwindui.com/img/logos/158x48/tuple-logo-white.svg" class="h-8 object-contain grayscale hover:grayscale-0 transition-all duration-300" alt="Tuple">
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+
+        <!-- ===== 6. CONTATO / CTA FINAL ===== -->
+        <section id="contato" class="py-24 md:py-40 text-center">
+            <div class="container mx-auto px-6">
+                <h2 class="cta-title text-4xl md:text-6xl font-thin tracking-wider">Let’s Build Something</h2>
+                <p class="cta-subtitle mt-4 mb-10 text-lg text-gray-400">Vamos transformar sua visão em um projeto incrível.</p>
+                <button class="cta-button btn-fill border border-indigo-500 text-indigo-400 font-medium py-4 px-12 rounded-full text-lg tracking-widest">
+                    INICIAR CONVERSA
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== 7. FOOTER ===== -->
+    <footer class="py-12 border-t border-white/10">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="hover:text-white transition-colors">Twitter</a>
+                <a href="#" class="hover:text-white transition-colors">LinkedIn</a>
+                <a href="#" class="hover:text-white transition-colors">Github</a>
+            </div>
+            <p class="text-sm">&copy; 2024 TUDDO. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Animações com GSAP ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animação do Header
+        gsap.from("#header", {
+            y: -100,
+            opacity: 0,
+            duration: 1,
+            ease: 'power3.out'
+        });
+
+        // Animação do Hero Section
+        gsap.from(".hero-title span", {
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'power3.out',
+            delay: 0.5
+        });
+        gsap.from(".hero-subtitle", {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            ease: 'power3.out',
+            delay: 1
+        });
+        gsap.from(".scroll-indicator", {
+            opacity: 0,
+            duration: 1.5,
+            delay: 1.5
+        });
+
+        // Função genérica para animações on-scroll
+        const animateOnScroll = (elem, vars) => {
+            gsap.from(elem, {
+                scrollTrigger: {
+                    trigger: elem,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none',
+                },
+                ...vars
+            });
+        };
+
+        // Animações de Títulos de Seção
+        document.querySelectorAll('.section-title').forEach(title => {
+            animateOnScroll(title, { y: 50, opacity: 0, duration: 1, ease: 'power3.out' });
+        });
+        
+        // Animação do Manifesto linha por linha
+        document.querySelectorAll('.manifesto-line').forEach((line, index) => {
+             gsap.from(line, {
+                scrollTrigger: {
+                    trigger: '.manifesto-text',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                y: 40,
+                opacity: 0,
+                duration: 0.8,
+                delay: index * 0.2,
+                ease: 'power3.out'
+            });
+        });
+
+        // Animação dos Cards de Projeto
+        gsap.from(".project-card", {
+            scrollTrigger: {
+                trigger: "#projetos",
+                start: 'top 70%',
+            },
+            y: 100,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power3.out'
+        });
+        
+        // Animação dos Itens de Serviço
+        gsap.from(".service-item", {
+            scrollTrigger: {
+                trigger: "#servicos",
+                start: 'top 70%',
+            },
+            y: 100,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power3.out'
+        });
+
+        // Animação dos Ícones SVG
+        document.querySelectorAll('.animated-svg').forEach(svg => {
+            const paths = svg.querySelectorAll('path');
+            paths.forEach(path => {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = length;
+                path.style.strokeDashoffset = length;
+                gsap.to(path, {
+                    strokeDashoffset: 0,
+                    duration: 2,
+                    ease: 'power2.inOut',
+                    scrollTrigger: {
+                        trigger: svg,
+                        start: 'top 85%',
+                    }
+                });
+            });
+        });
+        
+        // Animação do CTA Final
+        animateOnScroll(".cta-title", { y: 50, opacity: 0, duration: 1, ease: 'power3.out' });
+        animateOnScroll(".cta-subtitle", { y: 50, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.2 });
+        animateOnScroll(".cta-button", { scale: 0.8, opacity: 0, duration: 1, ease: 'back.out(1.7)', delay: 0.4 });
+
+
+        // --- Comportamento do Menu Mobile ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('translate-x-full');
+        });
+        
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+            });
+        });
+        
+        // --- Carrossel de Parceiros ---
+        // Usando animação CSS para simplicidade e performance
+        const marqueeContainer = document.querySelector('.animate-marquee');
+        if (marqueeContainer) {
+            const content = marqueeContainer.innerHTML;
+            marqueeContainer.innerHTML += content; // Duplica o conteúdo para o loop
+            
+            // Adiciona a animação via CSS
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes marquee {
+                    from { transform: translateX(0); }
+                    to { transform: translateX(-50%); }
+                }
+                .animate-marquee {
+                    animation: marquee 30s linear infinite;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    });
+    </script>
+</body>
+</html>
