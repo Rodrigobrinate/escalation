@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUDDO - Construindo o Futuro da Conectividade</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- GSAP (GreenSock Animation Platform) & ScrollTrigger Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* Estilos customizados e overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+            @apply bg-white text-gray-800;
+            @apply dark:bg-gray-900 dark:text-gray-200;
+            scroll-behavior: smooth;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Linhas finas de fundo */
+        .background-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+            background-size: 80px 80px;
+            opacity: 0.5;
+        }
+        .dark .background-grid {
+             background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+
+        /* Gradiente sutil */
+        .subtle-gradient {
+            @apply bg-gradient-to-b from-white to-gray-50;
+            @apply dark:from-gray-900 dark:to-gray-900/90;
+        }
+
+        /* Efeito de preenchimento fluido no botão */
+        .btn-fill {
+            position: relative;
+            overflow: hidden;
+            transition: color 0.4s ease-in-out;
+            z-index: 1;
+        }
+        .btn-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #4f46e5; /* indigo-600 */
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease-in-out;
+            z-index: -1;
+        }
+        .btn-fill:hover {
+            color: #ffffff;
+            border-color: #4f46e5;
+        }
+        .btn-fill:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Animação da borda do card */
+        .card-border-animate {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-border-animate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4f46e5);
+            transition: left 0.5s ease;
+        }
+        .card-border-animate:hover::before {
+            left: 100%;
+        }
+
+        /* Animação do ícone de scroll */
+        @keyframes scroll-bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        .scroll-indicator {
+            animation: scroll-bounce 2s infinite;
+        }
+        
+        /* Esconde a scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Ícone flutuante do WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    <script>
+        // Aplica o tema salvo no localStorage antes do carregamento da página para evitar flash
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+        
+        // Configuração do Tailwind para modo escuro
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              // ... suas extensões de tema
+            }
+          }
+        }
+    </script>
+</head>
+<body class="overflow-x-hidden">
+
+    <div class="background-grid"></div>
+
+    <!-- ===== HEADER / NAVEGAÇÃO ===== -->
+    <header id="header" class="fixed top-0 left-0 w-full p-6 z-50 transition-all duration-300 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/80 dark:border-gray-700/80">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <div class="text-2xl font-bold tracking-wider logo-anim text-gray-900 dark:text-white">
+                TUD<span class="text-indigo-600">O</span>
+            </div>
+            <!-- Navegação Desktop -->
+            <div class="flex items-center">
+                <nav class="hidden md:flex items-center space-x-8 text-sm font-light tracking-widest text-gray-700 dark:text-gray-300">
+                    <a href="#sobre" class="nav-link hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">SOBRE</a>
+                    <a href="#projetos" class="nav-link hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">PROJETOS</a>
+                    <a href="#servicos" class="nav-link hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">SERVIÇOS</a>
+                    <a href="#contato" class="nav-link bg-indigo-600 text-white py-2 px-4 rounded-full hover:bg-indigo-700 transition-colors duration-300">CONTATO</a>
+                </nav>
+                <!-- Botão de Troca de Tema -->
+                <button id="theme-toggle" type="button" class="ml-6 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 5.05A1 1 0 003.636 6.464l.707.707a1 1 0 001.414-1.414l-.707-.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1zM6.464 16.364a1 1 0 01-1.414 0l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 010 1.414z"></path></svg>
+                </button>
+                 <!-- Menu Mobile (Ícone) -->
+                <button id="mobile-menu-button" class="md:hidden z-50 text-gray-800 dark:text-gray-200 ml-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Menu Mobile (Painel) -->
+    <div id="mobile-menu" class="fixed top-0 left-0 w-full h-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm z-40 flex flex-col items-center justify-center space-y-8 text-xl tracking-widest text-gray-800 dark:text-gray-200 transform translate-x-full transition-transform duration-300 ease-in-out">
+        <a href="#sobre" class="mobile-nav-link">SOBRE</a>
+        <a href="#projetos" class="mobile-nav-link">PROJETOS</a>
+        <a href="#servicos" class="mobile-nav-link">SERVIÇOS</a>
+        <a href="#contato" class="mobile-nav-link">CONTATO</a>
+    </div>
+
+    <main>
+        <!-- ===== 1. HERO SECTION ===== -->
+        <section id="hero" class="h-screen flex flex-col justify-center items-center text-center relative p-4">
+            <h1 class="text-4xl md:text-7xl lg:text-8xl font-thin tracking-wider leading-tight hero-title text-gray-900 dark:text-white">
+                <span class="block">CONSTRUINDO O FUTURO</span>
+                <span class="block text-indigo-600 dark:text-indigo-400">DA CONECTIVIDADE</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-6 text-lg md:text-xl max-w-2xl hero-subtitle">Inovação, performance e design para transformar ideias em realidade digital.</p>
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 scroll-indicator">
+                <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+        </section>
+
+        <!-- ===== 2. SOBRE / MANIFESTO ===== -->
+        <section id="sobre" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 max-w-3xl text-center">
+                <h2 class="section-title text-3xl md:text-4xl font-light mb-8 tracking-wider text-gray-900 dark:text-white">NOSSO MANIFESTO</h2>
+                <div class="manifesto-text text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed space-y-4 font-light" style="letter-spacing: 0.5px;">
+                    <p class="manifesto-line">Acreditamos que a tecnologia é uma força para a simplicidade, não para a complexidade.</p>
+                    <p class="manifesto-line">Cada projeto é uma oportunidade de desafiar o status quo e criar experiências que importam.</p>
+                    <p class="manifesto-line">Somos movidos pela curiosidade, guiados pela estratégia e obcecados pela excelência em cada detalhe.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 3. PROJETOS / CASES ===== -->
+        <section id="projetos" class="py-20 md:py-32 subtle-gradient">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title text-center text-3xl md:text-4xl font-light mb-16 tracking-wider text-gray-900 dark:text-white">PROJETOS EM DESTAQUE</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                     <!-- Card de Projeto 1 -->
+                    <div class="project-card bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/50 card-border-animate border border-gray-200 dark:border-gray-800">
+                        <img src="image_0775cb.jpg" alt="Projeto de otimização de custos" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-600 dark:text-indigo-400">Otimização de Custos</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mt-2 font-light">Tecnologias avançadas para simplificar processos e maximizar recursos de rede.</p>
+                        </div>
+                    </div>
+                    <!-- Card de Projeto 2 -->
+                    <div class="project-card bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/50 card-border-animate border border-gray-200 dark:border-gray-800">
+                        <img src="image_077281.jpg" alt="Projeto preparando a rede para o futuro" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-600 dark:text-indigo-400">Redes do Futuro</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mt-2 font-light">Infraestrutura preparada para as demandas de realidade virtual e novas tecnologias.</p>
+                        </div>
+                    </div>
+                    <!-- Card de Projeto 3 -->
+                    <div class="project-card bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/50 card-border-animate border border-gray-200 dark:border-gray-800">
+                        <img src="image_077224.jpg" alt="Projeto de Customer Experience" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-600 dark:text-indigo-400">Customer Experience (CX)</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mt-2 font-light">Infraestrutura sólida e suporte ágil como diferencial competitivo.</p>
+                        </div>
+                    </div>
+                    <!-- Card de Projeto 4 -->
+                    <div class="project-card bg-white dark:bg-gray-800/50 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/50 card-border-animate border border-gray-200 dark:border-gray-800">
+                        <img src="image_076f3e.jpg" alt="Projeto de Conexão Inteligente" class="w-full h-80 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-medium text-indigo-600 dark:text-indigo-400">Conexão Inteligente com IXPs</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mt-2 font-light">Soluções de peering para otimizar rotas e melhorar a qualidade da conexão.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 4. SERVIÇOS / CAPACIDADES ===== -->
+        <section id="servicos" class="py-20 md:py-32">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title text-center text-3xl md:text-4xl font-light mb-16 tracking-wider text-gray-900 dark:text-white">NOSSAS CAPACIDADES</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                    <!-- Serviço 1: Links -->
+                    <div class="service-item">
+                        <div class="flex justify-center mb-4">
+                            <svg class="animated-svg w-16 h-16 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-medium mb-2 text-gray-900 dark:text-white">Links Dedicados & IP</h3>
+                        <p class="text-gray-600 dark:text-gray-400 font-light">Conectividade de alta performance e disponibilidade com links dedicados e gerenciamento de tráfego IP.</p>
+                    </div>
+                    <!-- Serviço 2: Monitoramento -->
+                    <div class="service-item">
+                        <div class="flex justify-center mb-4">
+                            <svg class="animated-svg w-16 h-16 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-medium mb-2 text-gray-900 dark:text-white">Monitoramento Proativo</h3>
+                        <p class="text-gray-600 dark:text-gray-400 font-light">Nossa equipe monitora sua rede 24/7 para identificar e resolver problemas antes que afetem seu negócio.</p>
+                    </div>
+                    <!-- Serviço 3: Atendimento -->
+                    <div class="service-item">
+                        <div class="flex justify-center mb-4">
+                            <svg class="animated-svg w-16 h-16 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.056 3 12s4.03 8.25 9 8.25z" />
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75a3.75 3.75 0 110-7.5 3.75 3.75 0 010 7.5z" />
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 12c0 .938-.183 1.834-.52 2.651m-14.46 0A9.003 9.003 0 013.25 12" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-medium mb-2 text-gray-900 dark:text-white">Atendimento Especializado</h3>
+                        <p class="text-gray-600 dark:text-gray-400 font-light">Suporte técnico humanizado e ágil, com especialistas prontos para ajudar a qualquer momento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== NOVA SEÇÃO: CDN ===== -->
+        <section id="cdn" class="py-20 md:py-32 subtle-gradient">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="section-title text-3xl md:text-4xl font-light mb-4 tracking-wider text-gray-900 dark:text-white">CDN: CONTEÚDO NA VELOCIDADE DA LUZ</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-16 max-w-3xl mx-auto">Estamos diretamente conectados às maiores redes de distribuição de conteúdo do mundo para garantir latência mínima e performance máxima.</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
+                    <div class="cdn-logo flex justify-center">
+                        <img src="https://cdn.simpleicons.org/google/black" class="h-10 object-contain dark:hidden" alt="Google CDN">
+                        <img src="https://cdn.simpleicons.org/google/white" class="h-10 object-contain hidden dark:block" alt="Google CDN Dark">
+                    </div>
+                    <div class="cdn-logo flex justify-center">
+                        <img src="https://cdn.simpleicons.org/netflix/black" class="h-10 object-contain dark:hidden" alt="Netflix CDN">
+                        <img src="https://cdn.simpleicons.org/netflix/white" class="h-10 object-contain hidden dark:block" alt="Netflix CDN Dark">
+                    </div>
+                    <div class="cdn-logo flex justify-center">
+                        <img src="https://cdn.simpleicons.org/cloudflare/black" class="h-10 object-contain dark:hidden" alt="Cloudflare CDN">
+                        <img src="https://cdn.simpleicons.org/cloudflare/white" class="h-10 object-contain hidden dark:block" alt="Cloudflare CDN Dark">
+                    </div>
+                    <div class="cdn-logo flex justify-center">
+                        <img src="https://cdn.simpleicons.org/akamai/black" class="h-10 object-contain dark:hidden" alt="Akamai CDN">
+                        <img src="https://cdn.simpleicons.org/akamai/white" class="h-10 object-contain hidden dark:block" alt="Akamai CDN Dark">
+                    </div>
+                    <div class="cdn-logo flex justify-center col-span-2 md:col-span-1 lg:col-span-1">
+                        <img src="https://cdn.simpleicons.org/amazonaws/black" class="h-10 object-contain dark:hidden" alt="Amazon AWS CDN">
+                        <img src="https://cdn.simpleicons.org/amazonaws/white" class="h-10 object-contain hidden dark:block" alt="Amazon AWS CDN Dark">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== NOVA SEÇÃO: PTTs ===== -->
+        <section id="ptts" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="section-title text-3xl md:text-4xl font-light mb-16 tracking-wider text-gray-900 dark:text-white">PRESENÇA NOS PRINCIPAIS PTTS</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                    <div class="ptt-item flex items-center justify-center space-x-3 p-4 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+                        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="font-light text-gray-700 dark:text-gray-300">Rio de Janeiro</span>
+                    </div>
+                    <div class="ptt-item flex items-center justify-center space-x-3 p-4 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+                        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="font-light text-gray-700 dark:text-gray-300">São Paulo</span>
+                    </div>
+                    <div class="ptt-item flex items-center justify-center space-x-3 p-4 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+                        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="font-light text-gray-700 dark:text-gray-300">Belo Horizonte</span>
+                    </div>
+                    <div class="ptt-item flex items-center justify-center space-x-3 p-4 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+                        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="font-light text-gray-700 dark:text-gray-300">Brasília</span>
+                    </div>
+                     <div class="ptt-item flex items-center justify-center space-x-3 p-4 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800">
+                        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="font-light text-gray-700 dark:text-gray-300">Vitória</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ===== 5. PARCEIROS / CLIENTES ===== -->
+        <section id="parceiros" class="py-20 md:py-24 bg-gray-100 dark:bg-gray-900/50">
+            <div class="container mx-auto px-6">
+                 <h2 class="section-title text-center text-3xl md:text-4xl font-light mb-16 tracking-wider text-gray-900 dark:text-white">QUEM CONFIA EM NÓS</h2>
+                 <div class="relative w-full overflow-hidden">
+                    <div class="flex animate-marquee">
+                        <div class="flex w-max items-center justify-center space-x-16 lg:space-x-24">
+                            <!-- Logos dos parceiros -->
+                            <img src="https://cdn.simpleicons.org/akamai/black" class="h-8 object-contain dark:hidden" alt="Akamai">
+                            <img src="https://cdn.simpleicons.org/akamai/white" class="h-8 object-contain hidden dark:block" alt="Akamai Dark">
+                            <img src="https://cdn.simpleicons.org/amazonaws/black" class="h-8 object-contain dark:hidden" alt="Amazon">
+                            <img src="https://cdn.simpleicons.org/amazonaws/white" class="h-8 object-contain hidden dark:block" alt="Amazon Dark">
+                            <div class="h-8 text-3xl font-thin text-gray-800 dark:text-gray-200">HUGE</div>
+                            <img src="https://tailwindui.com/img/logos/158x48/transistor-logo-gray-900.svg" class="h-8 object-contain dark:hidden" alt="Transistor">
+                            <img src="https://tailwindui.com/img/logos/158x48/transistor-logo-white.svg" class="h-8 object-contain hidden dark:block" alt="Transistor Dark">
+                            <img src="https://tailwindui.com/img/logos/158x48/reform-logo-gray-900.svg" class="h-8 object-contain dark:hidden" alt="Reform">
+                            <img src="https://tailwindui.com/img/logos/158x48/reform-logo-white.svg" class="h-8 object-contain hidden dark:block" alt="Reform Dark">
+                            <img src="https://tailwindui.com/img/logos/158x48/tuple-logo-gray-900.svg" class="h-8 object-contain dark:hidden" alt="Tuple">
+                            <img src="https://tailwindui.com/img/logos/158x48/tuple-logo-white.svg" class="h-8 object-contain hidden dark:block" alt="Tuple Dark">
+                            
+                            <!-- Logos duplicados para efeito contínuo -->
+                            <img src="https://cdn.simpleicons.org/akamai/black" class="h-8 object-contain dark:hidden" alt="Akamai">
+                            <img src="https://cdn.simpleicons.org/akamai/white" class="h-8 object-contain hidden dark:block" alt="Akamai Dark">
+                            <img src="https://cdn.simpleicons.org/amazonaws/black" class="h-8 object-contain dark:hidden" alt="Amazon">
+                            <img src="https://cdn.simpleicons.org/amazonaws/white" class="h-8 object-contain hidden dark:block" alt="Amazon Dark">
+                            <div class="h-8 text-3xl font-thin text-gray-800 dark:text-gray-200">HUGE</div>
+                            <img src="https://tailwindui.com/img/logos/158x48/transistor-logo-gray-900.svg" class="h-8 object-contain dark:hidden" alt="Transistor">
+                            <img src="https://tailwindui.com/img/logos/158x48/transistor-logo-white.svg" class="h-8 object-contain hidden dark:block" alt="Transistor Dark">
+                            <img src="https://tailwindui.com/img/logos/158x48/reform-logo-gray-900.svg" class="h-8 object-contain dark:hidden" alt="Reform">
+                            <img src="https://tailwindui.com/img/logos/158x48/reform-logo-white.svg" class="h-8 object-contain hidden dark:block" alt="Reform Dark">
+                            <img src="https://tailwindui.com/img/logos/158x48/tuple-logo-gray-900.svg" class="h-8 object-contain dark:hidden" alt="Tuple">
+                            <img src="https://tailwindui.com/img/logos/158x48/tuple-logo-white.svg" class="h-8 object-contain hidden dark:block" alt="Tuple Dark">
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+
+        <!-- ===== 6. CONTATO / CTA FINAL ===== -->
+        <section id="contato" class="py-24 md:py-40 text-center">
+            <div class="container mx-auto px-6">
+                <h2 class="cta-title text-4xl md:text-6xl font-thin tracking-wider text-gray-900 dark:text-white">Let’s Build Something</h2>
+                <p class="cta-subtitle mt-4 mb-10 text-lg text-gray-600 dark:text-gray-400">Vamos transformar sua visão em um projeto incrível.</p>
+                <button id="open-chat-popup" class="cta-button btn-fill border border-indigo-600 text-indigo-600 dark:text-indigo-400 font-medium py-4 px-12 rounded-full text-lg tracking-widest">
+                    INICIAR CONVERSA
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== 7. FOOTER ===== -->
+    <footer class="py-12 border-t border-gray-200 dark:border-gray-800">
+        <div class="container mx-auto px-6 text-center text-gray-500 dark:text-gray-400">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="hover:text-gray-900 dark:hover:text-white transition-colors">Twitter</a>
+                <a href="#" class="hover:text-gray-900 dark:hover:text-white transition-colors">LinkedIn</a>
+                <a href="#" class="hover:text-gray-900 dark:hover:text-white transition-colors">Github</a>
+            </div>
+            <p class="text-sm">&copy; 2024 TUDDO. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ===== Ícone Flutuante do WhatsApp ===== -->
+    <a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-8 h-8" fill="currentColor">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 .2c57.1 0 109.7 21.8 148.8 60.8 39.2 39.1 61 92.4 61 149.1 0 110.2-89.4 199.6-199.6 199.6-33.3 0-65.9-8.2-94.3-23.l-4.7-2.8-69.8 18.3L72 359.2l-2.9-4.8c-18.7-31.4-29.9-67.7-29.9-106.1 0-110.2 89.4-199.6 199.6-199.6zM223.9 111c-5.9 0-10.7 4.8-10.7 10.7v171.8c0 5.9 4.8 10.7 10.7 10.7s10.7-4.8 10.7-10.7V121.7c0-5.9-4.8-10.7-10.7-10.7zm0 213.5c-23.9 0-43.3 19.4-43.3 43.3s19.4 43.3 43.3 43.3 43.3-19.4 43.3-43.3-19.4-43.3-43.3-43.3z"/>
+            <path d="M223.9 32C100.3 32 0 132.3 0 256S100.3 480 223.9 480C318.3 480 404 419.5 435.1 336.3c1.8-4.8 3.5-9.6 5.1-14.5C448.9 293.2 448 261.8 448 256c0-123.7-100.3-224-224.1-224zm131.3 299.8c-11.2 25.2-34.1 43.5-61.5 49.8-27.4 6.3-56.5-1.5-78.4-18.9-21.9-17.4-35.4-43.8-35.4-72.3s13.5-54.9 35.4-72.3c21.9-17.4 51-25.2 78.4-18.9 27.4 6.3 50.3 24.6 61.5 49.8 11.2 25.2 14.3 53.7 9.4 81.1-4.9 27.4-20.9 51.5-44.8 65.8zm-119.5-94.8c-11.8 0-21.4 9.6-21.4 21.4s9.6 21.4 21.4 21.4 21.4-9.6 21.4-21.4-9.6-21.4-21.4-21.4z"/>
+        </svg>
+    </a>
+
+    <!-- ===== Pop-up de Chat para Email ===== -->
+    <div id="chat-popup-overlay" class="chat-popup-overlay fixed top-0 left-0 w-full h-full bg-black/50 backdrop-blur-sm z-[999] opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="chat-popup" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-95 w-[90%] max-w-md bg-white dark:bg-gray-900 rounded-2xl p-8 z-[1000] transition-transform duration-300 shadow-2xl dark:shadow-black/50">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-light text-gray-800 dark:text-white">Entre em Contato</h3>
+                <button id="close-chat-popup" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-3xl">&times;</button>
+            </div>
+            <form id="contact-form">
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome</label>
+                    <input type="text" id="name" name="name" class="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                    <input type="email" id="email" name="email" class="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mensagem</label>
+                    <textarea id="message" name="message" rows="4" class="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">
+                    Enviar Mensagem
+                </button>
+            </form>
+            <div id="form-success-message" class="hidden mt-4 text-center text-green-600 dark:text-green-400">
+                Obrigado pelo seu contato! Retornaremos em breve.
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- Lógica do Seletor de Tema ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        // Altera os ícones dentro do botão com base no tema atual
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            // alterna ícones
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            // se o tema foi salvo no localStorage, alterna-o
+            if (localStorage.getItem('theme')) {
+                if (localStorage.getItem('theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            // se não, verifica o tema do sistema e o define no localStorage
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            }
+        });
+
+        // --- Animações com GSAP ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animação do Header
+        gsap.from("#header", { y: -100, opacity: 0, duration: 1, ease: 'power3.out' });
+        gsap.from(".hero-title span", { y: 50, opacity: 0, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.5 });
+        gsap.from(".hero-subtitle", { y: 30, opacity: 0, duration: 1, ease: 'power3.out', delay: 1 });
+        gsap.from(".scroll-indicator", { opacity: 0, duration: 1.5, delay: 1.5 });
+
+        const animateOnScroll = (elem, vars) => {
+            gsap.from(elem, {
+                scrollTrigger: { trigger: elem, start: 'top 85%', toggleActions: 'play none none none' },
+                ...vars
+            });
+        };
+
+        document.querySelectorAll('.section-title').forEach(title => animateOnScroll(title, { y: 50, opacity: 0, duration: 1, ease: 'power3.out' }));
+        document.querySelectorAll('.manifesto-line').forEach((line, index) => {
+             gsap.from(line, {
+                scrollTrigger: { trigger: '.manifesto-text', start: 'top 80%', toggleActions: 'play none none none' },
+                y: 40, opacity: 0, duration: 0.8, delay: index * 0.2, ease: 'power3.out'
+            });
+        });
+        gsap.from(".project-card", { scrollTrigger: { trigger: "#projetos", start: 'top 70%' }, y: 100, opacity: 0, duration: 0.8, stagger: 0.2, ease: 'power3.out' });
+        gsap.from(".service-item", { scrollTrigger: { trigger: "#servicos", start: 'top 70%' }, y: 100, opacity: 0, duration: 0.8, stagger: 0.2, ease: 'power3.out' });
+        document.querySelectorAll('.animated-svg').forEach(svg => {
+            const paths = svg.querySelectorAll('path');
+            paths.forEach(path => {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = length;
+                path.style.strokeDashoffset = length;
+                gsap.to(path, {
+                    strokeDashoffset: 0, duration: 2, ease: 'power2.inOut',
+                    scrollTrigger: { trigger: svg, start: 'top 85%' }
+                });
+            });
+        });
+        gsap.from(".cdn-logo", { scrollTrigger: { trigger: "#cdn", start: 'top 80%' }, y: 50, opacity: 0, duration: 0.6, stagger: 0.15, ease: 'power3.out' });
+        gsap.from(".ptt-item", { scrollTrigger: { trigger: "#ptts", start: 'top 80%' }, y: 50, opacity: 0, duration: 0.6, stagger: 0.15, ease: 'power3.out' });
+        animateOnScroll(".cta-title", { y: 50, opacity: 0, duration: 1, ease: 'power3.out' });
+        animateOnScroll(".cta-subtitle", { y: 50, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.2 });
+        animateOnScroll(".cta-button", { scale: 0.8, opacity: 0, duration: 1, ease: 'back.out(1.7)', delay: 0.4 });
+
+        // --- Comportamento do Menu Mobile ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('translate-x-full'));
+        mobileNavLinks.forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('translate-x-full')));
+        
+        // --- Carrossel de Parceiros ---
+        const marqueeContainer = document.querySelector('.animate-marquee');
+        if (marqueeContainer) {
+            const content = marqueeContainer.innerHTML;
+            marqueeContainer.innerHTML += content;
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } } .animate-marquee { animation: marquee 40s linear infinite; }`;
+            document.head.appendChild(style);
+        }
+
+        // --- Lógica do Pop-up de Chat ---
+        const popupOverlay = document.getElementById('chat-popup-overlay');
+        const openPopupButton = document.getElementById('open-chat-popup');
+        const closePopupButton = document.getElementById('close-chat-popup');
+        const contactForm = document.getElementById('contact-form');
+        const successMessage = document.getElementById('form-success-message');
+        const chatPopup = document.getElementById('chat-popup');
+        
+        const openPopup = () => {
+            popupOverlay.classList.add('active');
+            chatPopup.classList.add('active');
+        };
+        const closePopup = () => {
+            popupOverlay.classList.remove('active');
+            chatPopup.classList.remove('active');
+        };
+
+        openPopupButton.addEventListener('click', openPopup);
+        closePopupButton.addEventListener('click', closePopup);
+        popupOverlay.addEventListener('click', (event) => {
+            if (event.target === popupOverlay) {
+                closePopup();
+            }
+        });
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            contactForm.style.display = 'none';
+            successMessage.classList.remove('hidden');
+            setTimeout(() => {
+                closePopup();
+                setTimeout(() => { // Aguarda a transição de fechamento
+                    contactForm.style.display = 'block';
+                    successMessage.classList.add('hidden');
+                    contactForm.reset();
+                }, 300);
+            }, 3000);
+        });
+    });
+    </script>
+</body>
+</html>
